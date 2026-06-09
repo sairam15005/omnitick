@@ -1,0 +1,271 @@
+{
+  "users": [
+    {
+      "id": "usr-admin",
+      "name": "Sairam Admin",
+      "email": "SAIRAM1592005@gmail.com",
+      "role": "Admin",
+      "avatar": "https://i.pravatar.cc/100?img=12",
+      "createdAt": "2026-06-09T06:00:50.003Z"
+    },
+    {
+      "id": "usr-organizer",
+      "name": "Saffron Events Ltd",
+      "email": "organizer@omnitick.in",
+      "role": "Organizer",
+      "avatar": "https://i.pravatar.cc/100?img=33",
+      "createdAt": "2026-06-09T06:00:50.003Z"
+    },
+    {
+      "id": "usr-normal",
+      "name": "Aarav Sharma",
+      "email": "aarav@gmail.com",
+      "role": "User",
+      "avatar": "https://i.pravatar.cc/100?img=15",
+      "createdAt": "2026-06-09T06:00:50.003Z"
+    }
+  ],
+  "events": [
+    {
+      "id": "1",
+      "name": "IPL 2026: MI vs CSK",
+      "category": "Sports",
+      "location": "Wankhede Stadium, Mumbai",
+      "date": "2026-04-15",
+      "time": "19:30",
+      "basePrice": 1500,
+      "available": 41,
+      "total": 33000,
+      "image": "https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&q=80&w=800",
+      "latitude": 18.9389,
+      "longitude": 72.8258,
+      "organizerId": "usr-organizer",
+      "organizerName": "Saffron Events Ltd",
+      "status": "Approved",
+      "isPublished": true
+    },
+    {
+      "id": "2",
+      "name": "Sunburn Festival Goa",
+      "category": "Music",
+      "location": "Vagator Beach, Goa",
+      "date": "2026-12-28",
+      "time": "16:00",
+      "basePrice": 4500,
+      "available": 119,
+      "total": 50000,
+      "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=800",
+      "latitude": 15.603,
+      "longitude": 73.7336,
+      "organizerId": "usr-organizer",
+      "organizerName": "Saffron Events Ltd",
+      "status": "Approved",
+      "isPublished": true
+    },
+    {
+      "id": "3",
+      "name": "India Art Fair 2026",
+      "category": "Expo",
+      "location": "NSIC Grounds, New Delhi",
+      "date": "2026-02-01",
+      "time": "10:00",
+      "basePrice": 700,
+      "available": 300,
+      "total": 5000,
+      "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=800",
+      "latitude": 28.5528,
+      "longitude": 77.2691,
+      "organizerId": "usr-organizer",
+      "organizerName": "Saffron Events Ltd",
+      "status": "Approved",
+      "isPublished": true
+    },
+    {
+      "id": "4",
+      "name": "Bangalore Tech Summit",
+      "category": "Conference",
+      "location": "Bangalore Palace, Bengaluru",
+      "date": "2026-11-18",
+      "time": "09:00",
+      "basePrice": 2500,
+      "available": 200,
+      "total": 2000,
+      "image": "https://images.unsplash.com/photo-1540575861501-7ce0e1d1aa99?auto=format&fit=crop&q=80&w=800",
+      "latitude": 12.998,
+      "longitude": 77.592,
+      "organizerId": "usr-organizer",
+      "organizerName": "Saffron Events Ltd",
+      "status": "Approved",
+      "isPublished": true
+    },
+    {
+      "id": "5",
+      "name": "Holi Music Festival",
+      "category": "Music",
+      "location": "Pushkar Lake, Rajasthan",
+      "date": "2026-03-14",
+      "time": "11:00",
+      "basePrice": 1200,
+      "available": 80,
+      "total": 1000,
+      "image": "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&q=80&w=800",
+      "latitude": 26.4897,
+      "longitude": 74.5511,
+      "organizerId": "usr-organizer",
+      "organizerName": "Saffron Events Ltd",
+      "status": "Approved",
+      "isPublished": true
+    },
+    {
+      "id": "6",
+      "name": "Classical Dance Festival",
+      "category": "Culture",
+      "location": "Khajuraho Temples, MP",
+      "date": "2026-01-20",
+      "time": "18:00",
+      "basePrice": 500,
+      "available": 150,
+      "total": 500,
+      "image": "https://images.unsplash.com/photo-1582373449142-65d880b703b1?auto=format&fit=crop&q=80&w=800",
+      "latitude": 24.8519,
+      "longitude": 79.9221,
+      "organizerId": "usr-organizer",
+      "organizerName": "Saffron Events Ltd",
+      "status": "Approved",
+      "isPublished": true
+    }
+  ],
+  "tickets": [
+    {
+      "id": "TKT-F4T9QIR85",
+      "user_id": "usr-normal",
+      "event_id": "1",
+      "event_name": "IPL 2026: MI vs CSK",
+      "date": "2026-04-15",
+      "location": "Wankhede Stadium, Mumbai",
+      "price": 1500,
+      "type": "General",
+      "status": "active",
+      "blockchain_hash": "9f9b7c0cb9c6e4c8ce97ea20abfa0ea5335b5223f467d76d16234f7d0839f4c7",
+      "qr_code": "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=9f9b7c0cb9c6e4c8ce97ea20abfa0ea5335b5223f467d76d16234f7d0839f4c7&choe=UTF-8",
+      "booking_date": "2026-06-09T06:07:21.747Z"
+    },
+    {
+      "id": "TKT-M4PB4MDHW",
+      "user_id": "usr-organizer",
+      "event_id": "1",
+      "event_name": "IPL 2026: MI vs CSK",
+      "date": "2026-04-15",
+      "location": "Wankhede Stadium, Mumbai",
+      "price": 1500,
+      "type": "General",
+      "status": "active",
+      "blockchain_hash": "2c00ad1124341e57f7df12c1e86237a797a431b575ba865f2b279b6d96fcd978",
+      "qr_code": "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=2c00ad1124341e57f7df12c1e86237a797a431b575ba865f2b279b6d96fcd978&choe=UTF-8",
+      "booking_date": "2026-06-09T07:12:20.943Z"
+    },
+    {
+      "id": "TKT-SMWB81PEC",
+      "user_id": "usr-admin",
+      "event_id": "1",
+      "event_name": "IPL 2026: MI vs CSK",
+      "date": "2026-04-15",
+      "location": "Wankhede Stadium, Mumbai",
+      "price": 1500,
+      "type": "General",
+      "status": "active",
+      "blockchain_hash": "1f30b29d43c6def2155b9c790f0968c2f7be46c68a668c13fcbf7f527ad4fee2",
+      "qr_code": "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=1f30b29d43c6def2155b9c790f0968c2f7be46c68a668c13fcbf7f527ad4fee2&choe=UTF-8",
+      "booking_date": "2026-06-09T07:13:48.734Z"
+    },
+    {
+      "id": "TKT-4KO9EM9N6",
+      "user_id": "usr-normal",
+      "event_id": "1",
+      "event_name": "IPL 2026: MI vs CSK",
+      "date": "2026-04-15",
+      "location": "Wankhede Stadium, Mumbai",
+      "price": 1500,
+      "type": "General",
+      "status": "active",
+      "blockchain_hash": "92bc0747bfa582862c8760c3eaee5909be11a3059dd7725c167bfda92e7cfb37",
+      "qr_code": "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=92bc0747bfa582862c8760c3eaee5909be11a3059dd7725c167bfda92e7cfb37&choe=UTF-8",
+      "booking_date": "2026-06-09T07:15:51.437Z"
+    },
+    {
+      "id": "TKT-6I1N913Y0",
+      "userId": "usr-normal",
+      "eventId": "2",
+      "eventName": "Sunburn Festival Goa",
+      "date": "2026-12-28",
+      "location": "Vagator Beach, Goa",
+      "price": 4500,
+      "type": "General",
+      "status": "used",
+      "blockchainHash": "c2ceb4a4e14177bdc4f1eb1ca01af0562c1e1cb2b117429055d89b1a0c19046e",
+      "qrCode": "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=c2ceb4a4e14177bdc4f1eb1ca01af0562c1e1cb2b117429055d89b1a0c19046e&choe=UTF-8",
+      "bookingDate": "2026-06-09T07:53:05.805Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "TX-9HMJRDZXQ",
+      "user_id": "usr-normal",
+      "ticket_id": "TKT-F4T9QIR85",
+      "amount": 1500,
+      "payment_status": "Paid",
+      "created_at": "2026-06-09T06:07:21.747Z"
+    },
+    {
+      "id": "TX-RV0KMBN5H",
+      "user_id": "usr-organizer",
+      "ticket_id": "TKT-M4PB4MDHW",
+      "amount": 1500,
+      "payment_status": "Paid",
+      "created_at": "2026-06-09T07:12:20.943Z"
+    },
+    {
+      "id": "TX-DB6WOPHKT",
+      "user_id": "usr-admin",
+      "ticket_id": "TKT-SMWB81PEC",
+      "amount": 1500,
+      "payment_status": "Paid",
+      "created_at": "2026-06-09T07:13:48.734Z"
+    },
+    {
+      "id": "TX-VWBUPM11H",
+      "user_id": "usr-normal",
+      "ticket_id": "TKT-4KO9EM9N6",
+      "amount": 1500,
+      "payment_status": "Paid",
+      "created_at": "2026-06-09T07:15:51.437Z"
+    },
+    {
+      "id": "TX-V0CCTEGQ2",
+      "userId": "usr-normal",
+      "ticketId": "TKT-6I1N913Y0",
+      "amount": 4500,
+      "paymentStatus": "Paid",
+      "createdAt": "2026-06-09T07:53:05.805Z"
+    }
+  ],
+  "checkInLogs": [
+    {
+      "id": "LOG-ZRKDOJXNM",
+      "ticketId": "TKT-6I1N913Y0",
+      "eventId": "2",
+      "eventName": "Sunburn Festival Goa",
+      "userId": "usr-normal",
+      "userName": "Aarav Sharma",
+      "entryTime": "2026-06-09T07:55:40.449Z",
+      "deviceIp": "127.0.0.1",
+      "deviceName": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "status": "Allowed",
+      "reason": "Valid Check-In",
+      "isFraudAttempt": false,
+      "blockchainHash": "c2ceb4a4e14177bdc4f1eb1ca01af0562c1e1cb2b117429055d89b1a0c19046e"
+    }
+  ],
+  "predictions": [],
+  "userPreferences": []
+}
