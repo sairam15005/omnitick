@@ -4,6 +4,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import * as QRCode from 'qrcode';
 import { createServer as createViteServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -48,6 +49,16 @@ app.use(cors());
 export function generateSHATicketHash(userId: string, eventId: string, timestamp: string): string {
   const dataString = `${userId}:${eventId}:${timestamp}`;
   return crypto.createHash('sha256').update(dataString).digest('hex');
+}
+
+// Local QR Code generation helper with remote fallback
+export async function buildTicketQRCode(ticketHash: string): Promise<string> {
+  try {
+    return await QRCode.toDataURL(ticketHash, { width: 250 });
+  } catch (err: any) {
+    console.warn('[QR Generation] Failed to build local QR Code image:', err?.message || err);
+    return `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodeURIComponent(ticketHash)}&choe=UTF-8`;
+  }
 }
 
 // Token Verification Middleware
@@ -298,9 +309,7 @@ app.post('/api/tickets', authenticateToken, async (req: any, res) => {
 
     // Generate SHA-256 hash secure pass
     const ticketHash = generateSHATicketHash(req.user.id, eventId, timestamp);
-
-    // Create QR code using standard Google Charts static image URL endpoint
-    const qrCode = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodeURIComponent(ticketHash)}&choe=UTF-8`;
+    const qrCode = await buildTicketQRCode(ticketHash);
 
     const newTicket: Ticket = {
       id: ticketId,
@@ -450,7 +459,7 @@ app.post('/api/payments/verify', authenticateToken, async (req: any, res) => {
     const timestamp = new Date().toISOString();
 
     const ticketHash = generateSHATicketHash(req.user.id, eventId, timestamp);
-    const qrCode = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodeURIComponent(ticketHash)}&choe=UTF-8`;
+    const qrCode = await buildTicketQRCode(ticketHash);
 
     const newTicket: Ticket = {
       id: ticketId,

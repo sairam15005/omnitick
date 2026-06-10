@@ -92,15 +92,21 @@ const TicketCard: React.FC<{ ticket: Ticket }> = ({ ticket }) => {
             </div>
 
             <div className="bg-white p-3 rounded-2xl my-3 shadow-2xl transition-transform">
-              <img 
-                src={ticket.qrCode
-                  .replace('size=150x150', 'size=250x250')
-                  .replace('size=250x250', 'size=250x250')
-                  .replace('chs=250x250', 'chs=250x250')
-                } 
-                alt="QR Code Pass" 
-                className="w-40 h-40" 
-              />
+              {ticket.qrCode ? (
+                <img 
+                  src={ticket.qrCode
+                    .replace('size=150x150', 'size=250x250')
+                    .replace('size=250x250', 'size=250x250')
+                    .replace('chs=250x250', 'chs=250x250')
+                  } 
+                  alt="QR Code Pass" 
+                  className="w-40 h-40" 
+                />
+              ) : (
+                <div className="w-40 h-40 flex items-center justify-center text-xs text-slate-500 font-bold uppercase tracking-wider">
+                  QR unavailable
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">

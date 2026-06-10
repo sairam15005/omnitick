@@ -6,6 +6,7 @@ import { processUserMessage } from '../services/gemini';
 import { generateTicketHash, recordOnLedger } from '../utils/blockchain';
 import { motion, AnimatePresence } from 'framer-motion';
 import Markdown from 'react-markdown';
+import * as QRCode from 'qrcode';
 
 interface ChatInterfaceProps {
   events: Event[];
@@ -107,6 +108,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ events, onTicketPurchase,
     }
   };
 
+  const buildQrCodeDataUrl = async (value: string) => {
+    try {
+      return await QRCode.toDataURL(value, { width: 150 });
+    } catch (err: any) {
+      console.warn('[Chat QR] local generation failed, falling back:', err?.message || err);
+      return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(value)}`;
+    }
+  };
+
   const handleAutoBooking = (entities: any) => {
     const foundEvent = entities.eventId 
       ? events.find(e => e.id === entities.eventId)
@@ -116,7 +126,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ events, onTicketPurchase,
         );
 
     if (foundEvent) {
-      setTimeout(() => {
+      setTimeout(async () => {
         const ticket: Ticket = {
           id: `TKT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
           userId: 'usr-guest',
@@ -128,9 +138,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ events, onTicketPurchase,
           type: 'General',
           status: 'active',
           blockchainHash: generateTicketHash(foundEvent),
-          qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${foundEvent.id}`,
+          qrCode: '',
           bookingDate: new Date().toISOString()
         };
+
+        ticket.qrCode = await buildQrCodeDataUrl(ticket.blockchainHash);
 
         recordOnLedger({
           action: 'TICKET_ISSUANCE',

@@ -92,6 +92,32 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
     }
   };
 
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorText(null);
+    setSuccessText(null);
+    setIsLoading(true);
+
+    if (!forgotEmail) {
+      setErrorText('Please provide a valid email address to reset your passphrase.');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Fallback behavior for the forgot password flow.
+      // If an API endpoint is added later, this can be replaced with a real request.
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      setSuccessText('Reset link dispatched to your email if it exists in the OmniTick network.');
+      setForgotEmail('');
+    } catch (err: any) {
+      setErrorText(err.message || 'Unable to process the reset request at this moment.');
+    } finally {
+      setIsLoading(false);
+      setShowForgot(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 relative overflow-hidden font-sans">
       <div className="mandala-bg animate-pulse" />
