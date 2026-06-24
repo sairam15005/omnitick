@@ -478,7 +478,7 @@ export class Database {
           disabledTables.add('users');
         }
         console.warn("[Database Fallback] getUsers via local JSON cache:", error.message);
-      } else if (data) {
+      } else if (data && data.length > 0) {
         return data.map(mapUserFromDb);
       }
     }
@@ -589,7 +589,7 @@ export class Database {
           disabledTables.add('events');
         }
         console.warn("[Database Fallback] getEvents via local JSON cache:", error.message);
-      } else if (data) {
+      } else if (data && data.length > 0) {
         return data.map(mapEventFromDb);
       }
     }
