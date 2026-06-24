@@ -181,14 +181,89 @@ export const demoPasswords: Record<string, string> = {
 
 // --- LAZY SUPABASE INITIALIZATION ENGINE ---
 let supabaseInstance: any = null;
+let wrappedSupabaseInstance: any = null;
 const disabledTables = new Set<string>();
 
 const isTableEnabled = (tableName: string): boolean => {
   return !disabledTables.has(tableName);
 };
 
+// Safe Query Proxy Helpers to capture Supabase connection/network failures
+function makeSafeProxy(target: any, tableName: string): any {
+  return new Proxy(target, {
+    get(obj, prop) {
+      if (prop === 'then') {
+        const originalThen = obj.then;
+        if (typeof originalThen === 'function') {
+          return (onfulfilled?: any, onrejected?: any) => {
+            const wrappedPromise = new Promise((resolve) => {
+              originalThen.call(
+                obj,
+                (val: any) => {
+                  if (val && typeof val === 'object') {
+                    if (val.error) {
+                      const errMsg = val.error.message || '';
+                      if (errMsg.includes("Could not find") || errMsg.includes("relation") || errMsg.includes("cache")) {
+                        disabledTables.add(tableName);
+                      }
+                    }
+                  }
+                  resolve(val);
+                },
+                (err: any) => {
+                  disabledTables.add(tableName);
+                  console.warn(`[Database Proxy Fallback] Supabase query on table '${tableName}' failed:`, err?.message || err);
+                  resolve({ data: null, error: err });
+                }
+              );
+            });
+            return wrappedPromise.then(onfulfilled, onrejected);
+          };
+        }
+      }
+
+      const val = obj[prop];
+      if (typeof val === 'function') {
+        return (...args: any[]) => {
+          const res = val.apply(obj, args);
+          if (res && (typeof res === 'object' || typeof res === 'function')) {
+            return makeSafeProxy(res, tableName);
+          }
+          return res;
+        };
+      }
+      if (val && (typeof val === 'object' || typeof val === 'function')) {
+        return makeSafeProxy(val, tableName);
+      }
+      return val;
+    }
+  });
+}
+
+const wrapSupabaseClient = (client: any) => {
+  return new Proxy(client, {
+    get(target, prop) {
+      if (prop === 'from') {
+        return (tableName: string) => {
+          const builder = target.from(tableName);
+          return makeSafeProxy(builder, tableName);
+        };
+      }
+      const val = target[prop];
+      if (typeof val === 'function') {
+        return (...args: any[]) => val.apply(target, args);
+      }
+      return val;
+    }
+  });
+};
+
 const getSupabaseClient = () => {
-  if (supabaseInstance) return supabaseInstance;
+  if (wrappedSupabaseInstance) return wrappedSupabaseInstance;
+  if (supabaseInstance) {
+    wrappedSupabaseInstance = wrapSupabaseClient(supabaseInstance);
+    return wrappedSupabaseInstance;
+  }
 
   const url = process.env.SUPABASE_URL;
   // Prioritize service role key on server-side to safley bypass RLS configs for operators/admins
@@ -202,7 +277,8 @@ const getSupabaseClient = () => {
         }
       });
       console.log("⚡ [OmniTick Base] Supabase database client integrated successfully.");
-      return supabaseInstance;
+      wrappedSupabaseInstance = wrapSupabaseClient(supabaseInstance);
+      return wrappedSupabaseInstance;
     } catch (err) {
       console.warn("[Database Warn] Failed to initiate Supabase client:", err);
     }
