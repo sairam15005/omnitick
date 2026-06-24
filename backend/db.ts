@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
-import { User, Event, Ticket, Transaction, CheckInLog, EventPrediction, UserPreferences } from '../types';
+import { User, Event, Ticket, Transaction, CheckInLog, EventPrediction, UserPreferences } from '../types.js';
 
 const DB_FILE_PATH = path.join(process.cwd(), 'data', 'db.json');
 

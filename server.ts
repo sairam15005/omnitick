@@ -7,8 +7,8 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import * as QRCode from 'qrcode';
 import { GoogleGenAI, Type } from '@google/genai';
-import { Database, demoPasswords } from './backend/db';
-import { Event, ChatMessage, IntentType, Ticket, Transaction, User, CheckInLog } from './types';
+import { Database, demoPasswords } from './backend/db.js';
+import { Event, ChatMessage, IntentType, Ticket, Transaction, User, CheckInLog } from './types.js';
 import Razorpay from 'razorpay';
 
 const rId = process.env.RAZORPAY_KEY_ID || '';
