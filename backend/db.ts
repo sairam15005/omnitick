@@ -7,9 +7,13 @@ const DB_FILE_PATH = path.join(process.cwd(), 'data', 'db.json');
 
 // Ensure the data directory exists
 const ensureDataDirectory = () => {
-  const dir = path.dirname(DB_FILE_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  try {
+    const dir = path.dirname(DB_FILE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  } catch (err: any) {
+    console.warn("[Database Warn] Failed to create data directory (expected on read-only serverless environments):", err.message);
   }
 };
 
@@ -354,12 +358,16 @@ const mapCheckInLogToDb = (log: CheckInLog): any => ({
 // -------------------------------------------------------------
 export class Database {
   private static load(): DatabaseSchema {
-    ensureDataDirectory();
-    if (!fs.existsSync(DB_FILE_PATH)) {
-      fs.writeFileSync(DB_FILE_PATH, JSON.stringify(INITIAL_SCHEMA, null, 2), 'utf-8');
-      return INITIAL_SCHEMA;
-    }
     try {
+      ensureDataDirectory();
+      if (!fs.existsSync(DB_FILE_PATH)) {
+        try {
+          fs.writeFileSync(DB_FILE_PATH, JSON.stringify(INITIAL_SCHEMA, null, 2), 'utf-8');
+        } catch (writeErr: any) {
+          console.warn("[Database Warn] Failed to write initial schema file locally (using memory instead):", writeErr.message);
+        }
+        return INITIAL_SCHEMA;
+      }
       const content = fs.readFileSync(DB_FILE_PATH, 'utf-8');
       const parsed = JSON.parse(content) as DatabaseSchema;
       if (!parsed.predictions) {
@@ -369,15 +377,19 @@ export class Database {
         parsed.userPreferences = [];
       }
       return parsed;
-    } catch (e) {
-      console.error("Failed to read local database file, resetting to initial schema", e);
+    } catch (e: any) {
+      console.warn("[Database Fallback] Failed to read database file, defaulting to in-memory INITIAL_SCHEMA:", e.message);
       return INITIAL_SCHEMA;
     }
   }
 
   private static save(data: DatabaseSchema) {
-    ensureDataDirectory();
-    fs.writeFileSync(DB_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    try {
+      ensureDataDirectory();
+      fs.writeFileSync(DB_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    } catch (e: any) {
+      console.warn("[Database Warn] Failed to save database update to disk (this is normal on read-only serverless platforms):", e.message);
+    }
   }
 
   // --- Users API ---
