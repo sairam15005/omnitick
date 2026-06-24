@@ -2095,13 +2095,17 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 Secure Full-Stack OmniTick server listening on port ${PORT}`);
-    console.log(`\n🔑 Demo portals for simultaneous multi-user testing:`);
-    console.log(`👤 User:      http://localhost:${PORT}/?demo=user`);
-    console.log(`🏢 Organizer: http://localhost:${PORT}/?demo=organizer`);
-    console.log(`⚙️  Admin:     http://localhost:${PORT}/?demo=admin\n`);
-  });
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 Secure Full-Stack OmniTick server listening on port ${PORT}`);
+      console.log(`\n🔑 Demo portals for simultaneous multi-user testing:`);
+      console.log(`👤 User:      http://localhost:${PORT}/?demo=user`);
+      console.log(`🏢 Organizer: http://localhost:${PORT}/?demo=organizer`);
+      console.log(`⚙️  Admin:     http://localhost:${PORT}/?demo=admin\n`);
+    });
+  }
 }
 
 startServer();
+
+export default app;
