@@ -5,9 +5,6 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import * as QRCode from 'qrcode';
-import { createServer as createViteServer } from 'vite';
-import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
 import { GoogleGenAI, Type } from '@google/genai';
 import { Database, demoPasswords } from './backend/db';
 import { Event, ChatMessage, IntentType, Ticket, Transaction, User, CheckInLog } from './types';
@@ -2071,6 +2068,10 @@ app.get('/api/ai/forecast', async (req, res) => {
 
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import('vite');
+    const { default: react } = await import('@vitejs/plugin-react');
+    const { default: tailwindcss } = await import('@tailwindcss/vite');
+
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
