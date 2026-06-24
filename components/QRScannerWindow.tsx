@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { 
   Camera, 
   CameraOff, 
@@ -35,6 +35,7 @@ const QRScannerWindow: React.FC<QRScannerWindowProps> = ({ onScanSuccess, onClos
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
   const qrReaderRef = useRef<Html5Qrcode | null>(null);
+  const isProcessingRef = useRef<boolean>(false);
   const readerId = "omnitick-qr-scanner-element";
 
   // Audio signals
@@ -102,35 +103,45 @@ const QRScannerWindow: React.FC<QRScannerWindowProps> = ({ onScanSuccess, onClos
     setScanStatus('starting');
 
     try {
-      const html5QrCode = new Html5Qrcode(readerId);
+      const html5QrCode = new Html5Qrcode(readerId, {
+        formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ],
+        useBarCodeDetectorIfSupported: true,
+        verbose: false
+      });
       qrReaderRef.current = html5QrCode;
 
       await html5QrCode.start(
         cameraId,
         {
-          fps: 15,
+          fps: 20, // Increase frame capture frequency for faster processing
           qrbox: (width, height) => {
             const minDim = Math.min(width, height);
-            const boxSize = Math.floor(minDim * 0.65);
+            // Expand target guide box so the ticket doesn't need to be perfectly centered
+            const boxSize = Math.floor(minDim * 0.85);
             return { width: boxSize, height: boxSize };
-          }
+          },
+          videoConstraints: {
+            focusMode: "continuous",
+            advanced: [{ focusMode: "continuous" }]
+          } as any
         },
         async (decodedText) => {
           // Success Callback
-          if (decodedText && decodedText !== lastScannedCode) {
+          if (decodedText && !isProcessingRef.current) {
+            isProcessingRef.current = true;
             setLastScannedCode(decodedText);
             playBeep(1200, 0.2); // high pitched verify beep
             setScanStatus('success');
             
-            // Stop scanning briefly, process, then resume
-            await stopCameraScanner();
+            // Process the scanned QR code
             await onScanSuccess(decodedText);
             
-            // Wait 2 seconds before returning to idle/scanning state
+            // Wait 1.2 seconds before returning directly to scanning state, keeping camera open!
             setTimeout(() => {
-              setScanStatus('idle');
+              setScanStatus('scanning');
               setLastScannedCode('');
-            }, 2500);
+              isProcessingRef.current = false;
+            }, 1200);
           }
         },
         (errorMessage) => {
@@ -160,6 +171,7 @@ const QRScannerWindow: React.FC<QRScannerWindowProps> = ({ onScanSuccess, onClos
       } finally {
         qrReaderRef.current = null;
         setIsScanning(false);
+        isProcessingRef.current = false;
       }
     }
   };

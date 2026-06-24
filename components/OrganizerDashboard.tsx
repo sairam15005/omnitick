@@ -351,15 +351,14 @@ const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({
           success: true,
           message: resData.message || 'Verification success! Node synchronized.'
         });
-        // Clear scanner input and trigger statistics fetch after a short timeout
         setScanHash('');
-        fetchOrganizerMetrics(true);
       } else {
         setScanResult({
           success: false,
           message: resData.error || 'Access Denied: Ticket checksum verification failed.'
         });
       }
+      fetchOrganizerMetrics(true);
     } catch (err: any) {
       setScanResult({
         success: false,
@@ -868,13 +867,13 @@ const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({
                           message: resData.message || 'Verification success! Node synchronized.'
                         });
                         setScanHash('');
-                        fetchOrganizerMetrics(true);
                       } else {
                         setScanResult({
                           success: false,
                           message: resData.error || 'Access Denied: Ticket check failed.'
                         });
                       }
+                      fetchOrganizerMetrics(true);
                     } catch (err) {
                       setScanResult({
                         success: false,
@@ -943,21 +942,21 @@ const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({
                       )}
                     </div>
                   </form>
+                </div>
+              )}
 
-                  {/* Scan Result Feedback Panel */}
-                  {scanResult && (
-                    <div className={`mt-5 p-4 rounded-xl border text-xs leading-normal animate-fadeIn ${
-                      scanResult.success 
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/15' 
-                        : 'bg-red-500/10 text-red-400 border-red-500/15'
-                    }`}>
-                      <p className="flex items-center gap-1.5 font-bold mb-1.5">
-                        {scanResult.success ? <CheckCircle2 size={14} className="text-emerald-400 shrink-0" /> : <XCircle size={14} className="text-red-400 shrink-0" />}
-                        {scanResult.success ? 'CHECK-IN APPROVED' : 'ACCESS REJECTED'}
-                      </p>
-                      <p className="font-medium font-mono text-[11px] leading-relaxed break-words">{scanResult.message}</p>
-                    </div>
-                  )}
+              {/* Scan Result Feedback Panel (Visible for both camera & manual scans) */}
+              {scanResult && (
+                <div className={`mt-5 p-4 rounded-xl border text-xs leading-normal animate-fadeIn ${
+                  scanResult.success 
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/15' 
+                    : 'bg-red-500/10 text-red-400 border-red-500/15'
+                }`}>
+                  <p className="flex items-center gap-1.5 font-bold mb-1.5">
+                    {scanResult.success ? <CheckCircle2 size={14} className="text-emerald-400 shrink-0" /> : <XCircle size={14} className="text-red-400 shrink-0" />}
+                    {scanResult.success ? 'CHECK-IN APPROVED' : 'ACCESS REJECTED'}
+                  </p>
+                  <p className="font-medium font-mono text-[11px] leading-relaxed break-words">{scanResult.message}</p>
                 </div>
               )}
             </div>

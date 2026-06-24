@@ -511,7 +511,7 @@ app.post('/api/tickets/verify', authenticateToken, async (req: any, res) => {
     if (!ticket) {
       // Create failure check_in_log (Fraud detection - counterfeit hash!)
       const logId = `LOG-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-      const log: CheckInLog = {
+      const log: CheckInLog & { scannedBy?: string } = {
         id: logId,
         ticketId: 'UNKNOWN',
         eventId: 'UNKNOWN',
@@ -524,7 +524,8 @@ app.post('/api/tickets/verify', authenticateToken, async (req: any, res) => {
         status: 'Rejected',
         reason: 'INVALID TICKET: Cryptographic hash not found in registered ticket tables.',
         isFraudAttempt: true,
-        blockchainHash: hash
+        blockchainHash: hash,
+        scannedBy: req.user.id
       };
       await Database.createCheckInLog(log);
 
@@ -543,7 +544,7 @@ app.post('/api/tickets/verify', authenticateToken, async (req: any, res) => {
 
     if (ticket.status === 'used' || existingAllowedLog) {
       const logId = `LOG-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-      const log: CheckInLog = {
+      const log: CheckInLog & { scannedBy?: string } = {
         id: logId,
         ticketId: ticket.id,
         eventId: ticket.eventId,
@@ -556,7 +557,8 @@ app.post('/api/tickets/verify', authenticateToken, async (req: any, res) => {
         status: 'Rejected',
         reason: 'DUPLICATE ENTRY DETECTED: Ticket already checked in.',
         isFraudAttempt: true,
-        blockchainHash: ticket.blockchainHash
+        blockchainHash: ticket.blockchainHash,
+        scannedBy: req.user.id
       };
       await Database.createCheckInLog(log);
 
@@ -568,7 +570,7 @@ app.post('/api/tickets/verify', authenticateToken, async (req: any, res) => {
 
     if (ticket.status === 'cancelled') {
       const logId = `LOG-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-      const log: CheckInLog = {
+      const log: CheckInLog & { scannedBy?: string } = {
         id: logId,
         ticketId: ticket.id,
         eventId: ticket.eventId,
@@ -581,7 +583,8 @@ app.post('/api/tickets/verify', authenticateToken, async (req: any, res) => {
         status: 'Rejected',
         reason: 'CANCELLED TICKET: Tried to check in a cancelled ticket.',
         isFraudAttempt: false,
-        blockchainHash: ticket.blockchainHash
+        blockchainHash: ticket.blockchainHash,
+        scannedBy: req.user.id
       };
       await Database.createCheckInLog(log);
 
@@ -597,7 +600,7 @@ app.post('/api/tickets/verify', authenticateToken, async (req: any, res) => {
 
     // Create a successful Check-In Log
     const logId = `LOG-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-    const log: CheckInLog = {
+    const log: CheckInLog & { scannedBy?: string } = {
       id: logId,
       ticketId: ticket.id,
       eventId: ticket.eventId,
@@ -610,7 +613,8 @@ app.post('/api/tickets/verify', authenticateToken, async (req: any, res) => {
       status: 'Allowed',
       reason: 'Valid Check-In',
       isFraudAttempt: false,
-      blockchainHash: ticket.blockchainHash
+      blockchainHash: ticket.blockchainHash,
+      scannedBy: req.user.id
     };
     await Database.createCheckInLog(log);
 
@@ -656,7 +660,10 @@ app.get('/api/organizer/analytics', authenticateToken, requireOrganizerOrAdmin, 
     const organizerTickets = allTickets.filter(t => organizerEventIds.has(t.eventId));
 
     const allLogs = await Database.getCheckInLogs();
-    const organizerLogs = allLogs.filter(l => organizerEventIds.has(l.eventId));
+    const organizerLogs = allLogs.filter(l => 
+      organizerEventIds.has(l.eventId) || 
+      (l as any).scannedBy === req.user.id
+    );
 
     // Calculate core metrics
     const ticketsSold = organizerTickets.filter(t => t.status !== 'cancelled').length;
