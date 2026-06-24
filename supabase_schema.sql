@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS public.events (
     organizer_id VARCHAR(50) NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
     organizer_name VARCHAR(150),
     status VARCHAR(20) NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
+    is_published BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -263,5 +264,50 @@ CREATE POLICY "Allow individual write access to user_preferences"
     ON public.user_preferences FOR ALL
     USING (true)
     WITH CHECK (true);
+
+
+-- -------------------------------------------------------------
+-- 8. SEED DATA FOR DEMO USERS AND EVENTS
+-- -------------------------------------------------------------
+
+-- Seed default users (with password 'admin123')
+INSERT INTO public.users (id, name, email, role, avatar, password_hash, created_at)
+VALUES 
+('usr-admin', 'Sairam Admin', 'sairam1592005@gmail.com', 'Admin', 'https://i.pravatar.cc/100?img=12', '$2a$10$7Xy739pL9g00Sve6V6A8Auz7V1TbyS.u66M/99OQMyvE9v4Wp5Ype', now()),
+('usr-organizer', 'Saffron Events Ltd', 'organizer@omnitick.in', 'Organizer', 'https://i.pravatar.cc/100?img=33', '$2a$10$7Xy739pL9g00Sve6V6A8Auz7V1TbyS.u66M/99OQMyvE9v4Wp5Ype', now()),
+('usr-normal', 'Aarav Sharma', 'aarav@gmail.com', 'User', 'https://i.pravatar.cc/100?img=15', '$2a$10$7Xy739pL9g00Sve6V6A8Auz7V1TbyS.u66M/99OQMyvE9v4Wp5Ype', now())
+ON CONFLICT (id) DO UPDATE SET 
+  name = EXCLUDED.name,
+  email = EXCLUDED.email,
+  role = EXCLUDED.role,
+  avatar = EXCLUDED.avatar,
+  password_hash = EXCLUDED.password_hash;
+
+-- Seed default events
+INSERT INTO public.events (id, name, category, location, date, time, base_price, available, total, image, latitude, longitude, organizer_id, organizer_name, status, is_published, created_at)
+VALUES
+('1', 'IPL 2026: MI vs CSK', 'Sports', 'Wankhede Stadium, Mumbai', '2026-04-15', '19:30', 1500, 45, 33000, 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&q=80&w=800', 18.9389, 72.8258, 'usr-organizer', 'Saffron Events Ltd', 'Approved', true, now()),
+('2', 'Sunburn Festival Goa', 'Music', 'Vagator Beach, Goa', '2026-12-28', '16:00', 4500, 120, 50000, 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=800', 15.6030, 73.7336, 'usr-organizer', 'Saffron Events Ltd', 'Approved', true, now()),
+('3', 'India Art Fair 2026', 'Expo', 'NSIC Grounds, New Delhi', '2026-02-01', '10:00', 700, 300, 5000, 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=800', 28.5528, 77.2691, 'usr-organizer', 'Saffron Events Ltd', 'Approved', true, now()),
+('4', 'Bangalore Tech Summit', 'Conference', 'Bangalore Palace, Bengaluru', '2026-11-18', '09:00', 2500, 200, 2000, 'https://images.unsplash.com/photo-1540575861501-7ce0e1d1aa99?auto=format&fit=crop&q=80&w=800', 12.9980, 77.5920, 'usr-organizer', 'Saffron Events Ltd', 'Approved', true, now()),
+('5', 'Holi Music Festival', 'Music', 'Pushkar Lake, Rajasthan', '2026-03-14', '11:00', 1200, 80, 1000, 'https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&q=80&w=800', 26.4897, 74.5511, 'usr-organizer', 'Saffron Events Ltd', 'Approved', true, now()),
+('6', 'Global AI Conclave', 'Conference', 'Jio World Convention Centre, Mumbai', '2026-09-05', '09:30', 5000, 150, 1500, 'https://images.unsplash.com/photo-1591115765373-5209708b7f11?auto=format&fit=crop&q=80&w=800', 19.0622, 72.8623, 'usr-organizer', 'Saffron Events Ltd', 'Approved', true, now())
+ON CONFLICT (id) DO UPDATE SET 
+  name = EXCLUDED.name,
+  category = EXCLUDED.category,
+  location = EXCLUDED.location,
+  date = EXCLUDED.date,
+  time = EXCLUDED.time,
+  base_price = EXCLUDED.base_price,
+  available = EXCLUDED.available,
+  total = EXCLUDED.total,
+  image = EXCLUDED.image,
+  latitude = EXCLUDED.latitude,
+  longitude = EXCLUDED.longitude,
+  organizer_id = EXCLUDED.organizer_id,
+  organizer_name = EXCLUDED.organizer_name,
+  status = EXCLUDED.status,
+  is_published = EXCLUDED.is_published;
+
 
 
