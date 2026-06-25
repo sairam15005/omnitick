@@ -174,7 +174,7 @@ const INITIAL_SCHEMA: DatabaseSchema = {
 
 // Plain JS Password hashing fallback values for simple demo passwords
 export const demoPasswords: Record<string, string> = {
-  "SAIRAM1592005@gmail.com": "$2a$10$7Xy739pL9g00Sve6V6A8Auz7V1TbyS.u66M/99OQMyvE9v4Wp5Ype", // admin123
+  "sairam1592005@gmail.com": "$2a$10$7Xy739pL9g00Sve6V6A8Auz7V1TbyS.u66M/99OQMyvE9v4Wp5Ype", // admin123
   "organizer@omnitick.in": "$2a$10$7Xy739pL9g00Sve6V6A8Auz7V1TbyS.u66M/99OQMyvE9v4Wp5Ype", // admin123
   "aarav@gmail.com": "$2a$10$7Xy739pL9g00Sve6V6A8Auz7V1TbyS.u66M/99OQMyvE9v4Wp5Ype" // admin123
 };
@@ -324,7 +324,7 @@ const mapEventFromDb = (row: any): Event => ({
   organizerId: row.organizer_id,
   organizerName: row.organizer_name || undefined,
   status: row.status,
-  isPublished: !!row.is_published
+  isPublished: row.is_published !== undefined ? !!row.is_published : true
 });
 
 const mapEventToDb = (evt: Partial<Event>): any => {
