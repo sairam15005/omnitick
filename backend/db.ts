@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
+// @ts-ignore
+import ws from 'ws';
 import { User, Event, Ticket, Transaction, CheckInLog, EventPrediction, UserPreferences } from '../types.js';
 
 const DB_FILE_PATH = path.join(process.cwd(), 'data', 'db.json');
@@ -274,6 +276,9 @@ const getSupabaseClient = () => {
       supabaseInstance = createClient(url, key, {
         auth: {
           persistSession: false
+        },
+        realtime: {
+          transport: ws
         }
       });
       console.log("⚡ [OmniTick Base] Supabase database client integrated successfully.");

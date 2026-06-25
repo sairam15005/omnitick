@@ -255,7 +255,7 @@ const App: React.FC = () => {
   const navItems = [
     { id: 'explore', label: 'Explore Events', icon: Compass },
     { id: 'map', label: 'Explore Map', icon: MapPin },
-    ...(user.role !== 'User' ? [{ id: 'chat', label: 'AI ChatBot', icon: MessageSquare }] : []),
+    { id: 'chat', label: 'AI ChatBot', icon: MessageSquare },
     { id: 'wallet', label: 'My Tickets', icon: TicketIcon },
     { id: 'ledger', label: 'Trust Ledger', icon: ShieldCheck },
   ];
@@ -373,12 +373,12 @@ const App: React.FC = () => {
             </button>
             <h2 className="text-sm font-black uppercase tracking-widest text-[#FF9933] flex items-center gap-2">
               <Sparkles size={16} />
-              {activeTab === 'explore' ? 'Disocver Indian Events' : 
+              {activeTab === 'explore' ? 'Discover Indian Events' : 
                activeTab === 'map' ? 'Saffron Location Coordinates' : 
                activeTab === 'chat' ? 'OmniTick AI Expert' : 
-               activeTab === 'dashboard' ? 'Attendence Projections' : 
+               activeTab === 'dashboard' ? 'Attendance Projections' : 
                activeTab === 'wallet' ? 'Pass Ledger Folders' : 
-               activeTab === 'ledger' ? 'Cryptographic Block audits' :
+               activeTab === 'ledger' ? 'Cryptographic Block Audits' :
                activeTab === 'organizer' ? 'Operator Controls' : 'Platform Administration'}
             </h2>
           </div>
@@ -463,7 +463,7 @@ const App: React.FC = () => {
             </>
           )}
         </div>
-        {user.role !== 'User' && (
+        {user.role === 'User' && (
           <VoiceBookingWidget 
             events={events} 
             onBookingSuccess={handleConfirmPurchase} 

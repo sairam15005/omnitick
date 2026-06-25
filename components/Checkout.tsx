@@ -76,6 +76,7 @@ const Checkout: React.FC<CheckoutProps> = ({ event, onBack, onConfirm }) => {
       if (orderData.isSandbox) {
         setSimulatedOrder(orderData);
         setShowSimulatedPayment(true);
+        setIsProcessing(false);
         return;
       }
 

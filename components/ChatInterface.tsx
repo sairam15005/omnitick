@@ -3,10 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Mic, User, Bot, Loader2, Ticket as TicketIcon, Zap } from 'lucide-react';
 import { ChatMessage, Event, IntentType, Ticket } from '../types';
 import { processUserMessage } from '../services/gemini';
-import { generateTicketHash, recordOnLedger } from '../utils/blockchain';
 import { motion, AnimatePresence } from 'framer-motion';
 import Markdown from 'react-markdown';
-import * as QRCode from 'qrcode';
 
 interface ChatInterfaceProps {
   events: Event[];
@@ -62,12 +60,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ events, onTicketPurchase,
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (initialPrompt) {
       handleSend(initialPrompt);
       onPromptHandled?.();
     }
-  }, [initialPrompt]);
+  }, [initialPrompt]); // handleSend is stable within component lifecycle
 
   const handleSend = async (text: string) => {
     if (!text.trim()) return;
@@ -108,16 +107,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ events, onTicketPurchase,
     }
   };
 
-  const buildQrCodeDataUrl = async (value: string) => {
-    try {
-      return await QRCode.toDataURL(value, { width: 150 });
-    } catch (err: any) {
-      console.warn('[Chat QR] local generation failed, falling back:', err?.message || err);
-      return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(value)}`;
-    }
-  };
-
-  const handleAutoBooking = (entities: any) => {
+  const handleAutoBooking = async (entities: any) => {
     const foundEvent = entities.eventId 
       ? events.find(e => e.id === entities.eventId)
       : events.find(e => 
@@ -126,30 +116,35 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ events, onTicketPurchase,
         );
 
     if (foundEvent) {
-      setTimeout(async () => {
-        const ticket: Ticket = {
-          id: `TKT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-          userId: 'usr-guest',
-          eventId: foundEvent.id,
-          eventName: foundEvent.name,
-          date: foundEvent.date,
-          location: foundEvent.location,
-          price: foundEvent.basePrice * (entities.quantity || 1),
-          type: 'General',
-          status: 'active',
-          blockchainHash: generateTicketHash(foundEvent),
-          qrCode: '',
-          bookingDate: new Date().toISOString()
-        };
-
-        ticket.qrCode = await buildQrCodeDataUrl(ticket.blockchainHash);
-
-        recordOnLedger({
-          action: 'TICKET_ISSUANCE',
-          ticketId: ticket.id,
-          hash: ticket.blockchainHash,
-          amount: ticket.price
+      try {
+        const token = sessionStorage.getItem('omni_jwt') || localStorage.getItem('omni_jwt');
+        const response = await fetch('/api/tickets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
+          body: JSON.stringify({
+            eventId: foundEvent.id,
+            quantity: entities.quantity || 1,
+            type: 'General'
+          })
         });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: `Sorry Bhai, I could not complete the booking: ${errData.error || 'Unknown error'}. Please try again or use the Checkout page.`,
+            timestamp: new Date(),
+            isTyping: true
+          }]);
+          return;
+        }
+
+        const data = await response.json();
+        const ticket: Ticket = data.ticket;
 
         onTicketPurchase(ticket);
 
@@ -160,7 +155,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ events, onTicketPurchase,
           timestamp: new Date(),
           isTyping: true
         }]);
-      }, 1500);
+      } catch (error: any) {
+        console.error('Chat auto-booking failed:', error);
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `Apologies, Bhai! There was a network error while booking. Please try again or book through the event page directly.`,
+          timestamp: new Date(),
+          isTyping: true
+        }]);
+      }
     }
   };
 

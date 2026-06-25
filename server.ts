@@ -15,7 +15,7 @@ const rId = process.env.RAZORPAY_KEY_ID || '';
 const rSecret = process.env.RAZORPAY_KEY_SECRET || '';
 
 const getRazorpayInstance = () => {
-  if (!rId || !rSecret) {
+  if (!rId || !rSecret || rId.includes('here') || rSecret.includes('here')) {
     return null;
   }
   return new Razorpay({
@@ -130,7 +130,7 @@ app.post('/api/auth/register', async (req, res) => {
     demoPasswords[email.toLowerCase()] = hashedPassword;
     await Database.createUser(newUser);
 
-    const token = jwt.sign({ id: userId, email, role }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: userId, email, role: 'User' }, JWT_SECRET, { expiresIn: '7d' });
     res.status(201).json({ token, user: newUser });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -738,7 +738,7 @@ app.get('/api/organizer/analytics', authenticateToken, requireOrganizerOrAdmin, 
         `;
 
         const response = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
+          model: "gemini-2.5-flash",
           contents: prompt,
           config: {
             responseMimeType: "application/json",
@@ -1026,12 +1026,12 @@ app.post('/api/ai/search', async (req, res) => {
       const searchSystemInstruction = `
         You are an expert Indian ticketing assistant parsing users' natural language event search queries.
         Extract filters from the user's input.
-        The year is 2026. Relative references like "this weekend", "next week", "this month" must be calculated relative to standard calendar structures in 2026. (For reference, today is June 3, 2026 and it is a Wednesday).
+        The year is ${new Date().getFullYear()}. Relative references like "this weekend", "next week", "this month" must be calculated relative to standard calendar structures. (For reference, today is ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}).
         Return filters structured in the requested JSON schema.
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: [
           { text: `Current Year & Time context: ${currentLocTime}` },
           { text: `Query: "${query}"` }
@@ -1227,7 +1227,7 @@ app.post('/api/ai/event-assistant', async (req, res) => {
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: [
           { text: eventContext },
           { text: `User Question: "${question}"` }
@@ -1304,7 +1304,7 @@ app.post('/api/ai/dynamic-pricing/:id', async (req, res) => {
     }
 
     // Days remaining calculations (base reference: 2026-06-03)
-    const today = new Date('2026-06-03');
+    const today = new Date();
     const eventDate = new Date(event.date);
     const diffTime = eventDate.getTime() - today.getTime();
     const daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
@@ -1420,7 +1420,7 @@ app.post('/api/ai/dynamic-pricing/:id', async (req, res) => {
         `;
 
         const response = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
+          model: "gemini-2.5-flash",
           contents: [
             { text: `Calculate AI dynamic ticket pricing advice. Output active response JSON, Bhai.` }
           ],
@@ -1476,7 +1476,7 @@ app.post('/api/ai/predict-event-success', async (req, res) => {
     const capacity = parseInt(total) || 500;
 
     // Days until event calculation
-    const today = new Date('2026-06-03');
+    const today = new Date();
     const eventDate = new Date(date);
     const diffTime = eventDate.getTime() - today.getTime();
     const daysUntil = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
@@ -1592,7 +1592,7 @@ app.post('/api/ai/predict-event-success', async (req, res) => {
         `;
 
         const response = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
+          model: "gemini-2.5-flash",
           contents: [
             { text: `Analyze event success for ${name} in ${location}. Output strictly JSON.` }
           ],
@@ -1739,7 +1739,7 @@ app.post('/api/ai/voice-intent', authenticateToken, async (req: any, res) => {
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -1940,7 +1940,7 @@ app.post('/api/ai/recommendations', authenticateToken, async (req: any, res) => 
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
